@@ -1,6 +1,5 @@
---Mohammadreza Sherkati
+
 --A test bench for 32 bit ALU with overflow and carry out and zero signals
---Home work number four for VHDL course
 
 library ieee;
 use ieee.std_logic_1164.all;
