@@ -1,6 +1,6 @@
 # Designing-ALU-with-VHDL
 
-In this project, I designed a 32 bit ALU with carry, zero and overflow signals. There is a 4 bit input control signal for the ALU, which controls and selects its function. The function of this ALU are listed below:
+In this project, I designed a 32 bit ALU (Arithmetic Logic Unit) with carry, zero and overflow signals. There is a 4 bit input control signal for the ALU, which controls and selects its function. The function of this ALU are listed below:
 
 - Control signal = "0000" : Signed addition.
 - Control signal = "0001" : Unsigned addition.
