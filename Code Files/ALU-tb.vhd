@@ -1,0 +1,158 @@
+--Mohammadreza Sherkati
+--A test bench for 32 bit ALU with overflow and carry out and zero signals
+--Home work number four for VHDL course
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity test_bench is
+end test_bench;
+
+architecture one of test_bench is
+
+component alu32b is
+port(a,b: in std_logic_vector(31 downto 0);
+    m: in std_logic_vector(3 downto 0);
+    s: out std_logic_vector(31 downto 0);
+    z,c,ovf: out std_logic);
+end component;
+
+signal ain,bin: std_logic_vector(31 downto 0);
+signal min: std_logic_vector(3 downto 0);
+signal sout: std_logic_vector(31 downto 0);
+signal zout,cout,ovfout: std_logic;
+
+begin
+uut: alu32b
+port map(a => ain,
+b => bin,
+m => min,
+s => sout,
+z => zout,
+c => cout,
+ovf => ovfout);
+
+-- test vector generator
+process
+begin
+wait for 10 ns;
+ain <= "00000000000000000000000000000001";
+bin <= "00000000000000010000000000000001";--1
+min <= "0000";
+wait for 10 ns;
+ain <= "10000000000000000000000000000001";
+bin <= "10000000000000010000000000000001";--2
+min <= "0000";
+wait for 10 ns;
+ain <= "01000000000000000000000000000001";
+bin <= "01000000000000010000000000000001";--3
+min <= "0000";
+wait for 10 ns;
+ain <= "10000000000000000000000000000001";
+bin <= "10000000000000010000000000000001";--4
+min <= "0001";
+wait for 10 ns;
+ain <= "00000010000000000000100000000001";
+bin <= "00000010000000010000000001000001";--5
+min <= "0001";
+wait for 10 ns;
+ain <= "10000000000000000000000000000001";
+bin <= "10000000000000000000000000000001";--6
+min <= "0010";
+wait for 10 ns;
+ain <= "10000000000000000000000000000000";
+bin <= "00000000000000000000000000000001";--7
+min <= "0010";
+wait for 10 ns;
+ain <= "00000000000000000000100000000000";
+bin <= "00000000000000000000000000000001";--8
+min <= "0010";
+wait for 10 ns;
+ain <= "00000000000000000000000000000000";
+bin <= "00000000000000000000000000000001";--9
+min <= "0011";
+wait for 10 ns;
+ain <= "10000000000000000000000100010100";
+bin <= "00000000000000000000101000100001";--10
+min <= "0100";
+wait for 10 ns;
+ain <= "00001000000000000000000010000000";
+bin <= "00000000000000010000000000000001";--11
+min <= "0100";
+wait for 10 ns;
+ain <= "10000000000000000000000000000000";
+bin <= "00000000000000000000000000000001";--12
+min <= "0101";
+wait for 10 ns;
+ain <= "00000000000000000000000000000000";
+bin <= "00000000000000000000000000000001";--13
+min <= "0101";
+wait for 10 ns;
+ain <= "11111111111111111111111111111111";
+bin <= "00000000000000000000000000000101";--14
+min <= "0110";
+wait for 10 ns;
+ain <= "11111111111111111111111111111111";
+bin <= "00000000000000000000000000000101";--15
+min <= "0111";
+wait for 10 ns;
+ain <= "11111111111111111111111111111111";
+bin <= "00000000000000000000000000000101";--16
+min <= "1000";
+wait for 10 ns;
+ain <= "11111111111111111111111111111111";
+bin <= "00000000000000000000000000000101";--17
+min <= "1001";
+end process;
+
+-- verifier
+process
+variable error_status: boolean;
+begin
+  wait on ain, bin, min;
+wait for 5 ns;
+if((ain = "00000000000000000000000000000001" and bin = "00000000000000010000000000000001" and min = "0000"
+ and sout = "00000000000000010000000000000010" and zout = '0' and cout = '0' and ovfout = '0') or
+(ain = "10000000000000000000000000000001" and bin = "10000000000000010000000000000001" and min = "0000"
+ and sout = "00000000000000010000000000000010" and zout = '0' and cout = '1' and ovfout = '1') or
+(ain = "01000000000000000000000000000001" and bin = "01000000000000010000000000000001" and min = "0000"
+ and sout = "10000000000000010000000000000010" and zout = '0' and cout = '0' and ovfout = '1') or
+(ain = "10000000000000000000000000000001" and bin = "10000000000000010000000000000001" and min = "0001"
+ and sout = "00000000000000010000000000000010" and zout = '0' and cout = '1' and ovfout = '0') or
+(ain = "00000010000000000000100000000001" and bin = "00000010000000010000000001000001" and min = "0001"
+ and sout = "00000100000000010000100001000010" and zout = '0' and cout = '0' and ovfout = '0') or
+(ain = "10000000000000000000000000000001" and bin = "10000000000000000000000000000001" and min = "0010"
+ and sout = "00000000000000000000000000000000" and zout = '1' and cout = '0' and ovfout = '0') or
+(ain = "10000000000000000000000000000000" and bin = "00000000000000000000000000000001" and min = "0010"
+ and sout = "01111111111111111111111111111111" and zout = '0' and cout = '1' and ovfout = '1') or
+(ain = "00000000000000000000100000000000" and bin = "00000000000000000000000000000001" and min = "0010"
+ and sout = "00000000000000000000011111111111" and zout = '0' and cout = '0' and ovfout = '0') or
+(ain = "00000000000000000000000000000000" and bin = "00000000000000000000000000000001" and min = "0011"
+ and sout = "11111111111111111111111111111111" and zout = '0' and cout = '1' and ovfout = '0') or
+(ain = "10000000000000000000000100010100" and bin = "00000000000000000000101000100001" and min = "0100"
+ and sout = "00000000000000000000000000000001" and zout = '0' and cout = '0' and ovfout = '0') or
+(ain = "00001000000000000000000010000000" and bin = "00000000000000010000000000000001" and min = "0100"
+ and sout = "00000000000000000000000000000000" and zout = '0' and cout = '0' and ovfout = '0') or
+(ain = "10000000000000000000000000000000" and bin = "00000000000000000000000000000001" and min = "0101"
+ and sout = "00000000000000000000000000000000" and zout = '0' and cout = '0' and ovfout = '0') or
+(ain = "00000000000000000000000000000000" and bin = "00000000000000000000000000000001" and min = "0101"
+ and sout = "00000000000000000000000000000001" and zout = '0' and cout = '0' and ovfout = '0') or
+(ain = "11111111111111111111111111111111" and bin = "00000000000000000000000000000101" and min = "0110"
+ and sout = "00000000000000000000000000000101" and zout = '0' and cout = '0' and ovfout = '0') or
+(ain = "11111111111111111111111111111111" and bin = "00000000000000000000000000000101" and min = "0111"
+ and sout = "11111111111111111111111111111111" and zout = '0' and cout = '0' and ovfout = '0') or
+(ain = "11111111111111111111111111111111" and bin = "00000000000000000000000000000101" and min = "1000"
+ and sout = "00000000000000000000000000000000" and zout = '0' and cout = '0' and ovfout = '0') or
+(ain = "11111111111111111111111111111111" and bin = "00000000000000000000000000000101" and min = "1001"
+ and sout = "11111111111111111111111111111010" and zout = '0' and cout = '0' and ovfout = '0')) then
+error_status := false;
+else
+error_status := true;
+end if;
+-- error reporting
+assert not error_status
+report "test failed."
+severity note;
+end process;
+end one;
